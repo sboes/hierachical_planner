@@ -1,70 +1,65 @@
 # utils/planarRobot.py
 
+import sympy as sp
 import numpy as np
-from shapely.geometry import LineString, Point
+import matplotlib.pyplot as plt
 
+class PlanarJoint:
+    def __init__(self, a=1.5, init_theta=0, id=0):
+        self.a = a
+        self.theta = init_theta
+        self.sym_a, self.sym_theta = sp.symbols(f'a_{id} theta_{id}')
+        self.M = sp.Matrix([
+            [sp.cos(self.sym_theta), -sp.sin(self.sym_theta), self.sym_a * sp.cos(self.sym_theta)],
+            [sp.sin(self.sym_theta),  sp.cos(self.sym_theta), self.sym_a * sp.sin(self.sym_theta)],
+            [0,                      0,                       1]
+        ])
+
+    def get_subs(self):
+        return {self.sym_a: self.a, self.sym_theta: self.theta}
+
+    def move(self, theta):
+        self.theta = theta
 
 class PlanarRobot:
-    def __init__(self, n_joints=2, link_lengths=None):
-        self.n_joints = n_joints
+    def __init__(self, n_joints=3, link_lengths=None):
+        self.dim = n_joints
         if link_lengths is None:
-            self.link_lengths = [1.0] * n_joints
-        else:
-            assert len(link_lengths) == n_joints
-            self.link_lengths = link_lengths
+            link_lengths = [1.5] * n_joints
+        self.joints = [PlanarJoint(link_lengths[i], id=i) for i in range(n_joints)]
+        self.Ms = [sp.eye(3)]
+        for joint in self.joints:
+            self.Ms.append(self.Ms[-1] * joint.M)
 
-    def forward_kinematics(self, config):
-        """
-        config: list of joint angles (in radians)
-        returns: list of (x, y) tuples representing joint positions
-        """
-        positions = [(0, 0)]
-        x, y = 0, 0
-        theta = 0
-        for i, angle in enumerate(config):
-            theta += angle
-            dx = self.link_lengths[i] * np.cos(theta)
-            dy = self.link_lengths[i] * np.sin(theta)
-            x += dx
-            y += dy
-            positions.append((x, y))
-        return positions
+    def move(self, thetas):
+        for joint, theta in zip(self.joints, thetas):
+            joint.move(theta)
 
+    def get_transforms(self):
+        subs = {}
+        for joint in self.joints:
+            subs.update(joint.get_subs())
+        return [np.array((M.subs(subs) @ sp.Matrix([0, 0, 1]))[:2]).astype(np.float32).flatten() for M in self.Ms]
 
-class KinChainCollisionChecker:
-    def __init__(self, kin_chain: PlanarRobot, scene, limits=None, fk_resolution=0.2):
-        self.kin_chain = kin_chain
-        self.scene = scene
-        self.fk_resolution = fk_resolution
-        if limits is None:
-            self.limits = [[-np.pi, np.pi]] * kin_chain.n_joints
-        else:
-            self.limits = limits
+    def draw(self, ax, color='green'):
+        points = self.get_transforms()
+        for i in range(1, len(points)):
+            x = [points[i - 1][0], points[i][0]]
+            y = [points[i - 1][1], points[i][1]]
+            ax.plot(x, y, color=color, linewidth=2)
+        ax.plot(*points[-1], 'o', color='blue')
 
-    def point_in_collision(self, config):
-        points = self.kin_chain.forward_kinematics(config)
-        for i in range(len(points) - 1):
-            link = LineString([points[i], points[i + 1]])
-            for obstacle in self.scene.values():
-                if link.intersects(obstacle):
-                    return True
-        return False
+    def animate_motion(self, trajectory, ax, interval=200):
+        from matplotlib.animation import FuncAnimation
 
-    def line_in_collision(self, from_config, to_config):
-        from_config = np.array(from_config)
-        to_config = np.array(to_config)
-        diff = to_config - from_config
-        dist = np.linalg.norm(diff)
-        steps = max(int(dist / self.fk_resolution), 1)
-        for i in range(steps + 1):
-            alpha = i / steps
-            interp_config = from_config + alpha * diff
-            if self.point_in_collision(interp_config):
-                return True
-        return False
+        def update(i):
+            ax.clear()
+            self.move(trajectory[i])
+            self.draw(ax)
+            ax.set_xlim(-self.dim * 2, self.dim * 2)
+            ax.set_ylim(-self.dim * 2, self.dim * 2)
+            ax.set_title(f"Step {i}")
+            ax.set_aspect("equal")
 
-    def draw_obstacles(self, ax):
-        for obs in self.scene.values():
-            if hasattr(obs, 'exterior'):
-                x, y = obs.exterior.xy
-                ax.fill(x, y, color='lightcoral', alpha=0.5)
+        ani = FuncAnimation(plt.gcf(), update, frames=len(trajectory), interval=interval)
+        plt.show()
