@@ -30,10 +30,9 @@ class BasicPRM:
     # ----- Sampling -----
     def _get_random_free_position(self, max_tries=1000):
         for _ in range(max_tries):
-            pos = np.array([
-                random.uniform(lmin, lmax)
-                for lmin, lmax in zip(self.limits[0], self.limits[1])
-            ])
+            x = random.uniform(*self.limits[0])
+            y = random.uniform(*self.limits[1])
+            pos = np.array([x, y])
             if not self._point_in_collision(pos):
                 return pos
         raise RuntimeError("No collision-free sample found.")
