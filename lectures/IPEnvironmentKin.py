@@ -30,45 +30,43 @@ def interpolate_line(startPos, endPos, step_l):
 
 class KinChainCollisionChecker(CollisionChecker):
     def __init__(self, kin_chain, scene, limits=[[-3.0, 3.0], [-3.0, 3.0]], statistic=None, fk_resolution=0.1):
-        super(KinChainCollisionChecker, self).__init__(scene, limits)
-        self.statistic = statistic
-        if len(limits) != 2 or len(limits[0]) != kin_chain.dim or len(limits[1]) != kin_chain.dim:
-            raise ValueError("Limits must be a list [lower_limits, upper_limits] matching robot dimensions.")
+        super(KinChainCollisionChecker, self).__init__(scene, limits, statistic)
+        if len(limits) != kin_chain.dim:
+            raise ValueError("Limits must match the dimension of the kinematic chain. Default values are for a 2-dof planar manipulator. If you use dof>2 you have to specify the limits explicitly")
         self.kin_chain = kin_chain
         self.fk_resolution = fk_resolution
         self.dim = self.kin_chain.dim
 
-    def point_in_collision(self, pos):  # Geändert von pointInCollision
+    def getDim(self):
+        return self.dim
+    
+    def pointInCollision(self, pos):
         self.kin_chain.move(pos)
         joint_positions = self.kin_chain.get_transforms()
         for i in range(1, len(joint_positions)):
-            if self.segment_in_collision(joint_positions[i - 1], joint_positions[i]):
+            if self.segmentInCollision(joint_positions[i-1], joint_positions[i]):
                 return True
         return False
-
-    def line_in_collision(self, startPos, endPos):  # Geändert von lineInCollision
-        assert len(startPos) == self.get_dim()
-        assert len(endPos) == self.get_dim()
-        steps = self._interpolate_line(startPos, endPos, self.fk_resolution)
+    
+    def lineInCollision(self, startPos, endPos):
+        assert (len(startPos) == self.getDim())
+        assert (len(endPos) == self.getDim())
+        steps = interpolate_line(startPos, endPos, self.fk_resolution)
         for pos in steps:
-            if self.point_in_collision(pos):
+            if self.pointInCollision(pos):
                 return True
         return False
-
-    def segment_in_collision(self, startPos, endPos):  # Geändert von segmentInCollision
+    
+    def segmentInCollision(self, startPos, endPos):
         for key, value in self.scene.items():
             if value.intersects(LineString([(startPos[0], startPos[1]), (endPos[0], endPos[1])])):
                 return True
         return False
-
-    def get_dim(self):  # Geändert von getDim
-        return self.dim
-
-    def _interpolate_line(self, start, end, resolution):
-        diff = np.array(end) - np.array(start)
-        distance = np.linalg.norm(diff)
-        num_steps = max(2, int(distance / resolution))
-        return [start + diff * t for t in np.linspace(0, 1, num_steps)]
+    
+    def drawObstacles(self, ax, inWorkspace=False):
+        if inWorkspace:
+            for key, value in self.scene.items():
+                plotting.plot_polygon(value, add_points=False, color='red', ax=ax)
 
 
 
@@ -85,7 +83,7 @@ import matplotlib.animation
 from IPython.display import HTML
 
 matplotlib.rcParams['animation.embed_limit'] = 64
-def animateSolution(planner, environment, solution, visualizer):
+def animateSolution(planner, environment, solution, visualizer, workSpaceLimits=[[-3,3],[-3,3]]):
     _planner = planner
     _environment = environment
     _solution = solution
@@ -113,8 +111,10 @@ def animateSolution(planner, environment, solution, visualizer):
             ## clear taks space figure
             ax1.cla()
             ## fix figure size
+            ax1.set_xlim(workSpaceLimits[0])
+            ax1.set_ylim(workSpaceLimits[1])
             ## draw obstacles
-            _environment.drawObstacles(ax1)
+            _environment.drawObstacles(ax1, inWorkspace = True)
             ## update robot position
             pos = i_solution_pos[t]
             r.move(pos)
@@ -151,8 +151,10 @@ def animateSolution(planner, environment, solution, visualizer):
             ## clear taks space figure
             ax1.cla()
             ## fix figure size
+            ax1.set_xlim(workSpaceLimits[0])
+            ax1.set_ylim(workSpaceLimits[1])
             ## draw obstacles
-            _environment.drawObstacles(ax1)
+            _environment.drawObstacles(ax1, inWorkspace = True)
             ## update robot position
             pos = i_solution_pos[t]
             r.move(pos)

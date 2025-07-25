@@ -3,10 +3,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from shapely.geometry import LineString, Polygon
-from IPEnvironmentKin import KinChainCollisionChecker
-from IPPlanarManipulator import PlanarRobot
-from IPBasicPRM import BasicPRM
+from shapely.geometry import LineString
+from lectures.IPEnvironmentKin import KinChainCollisionChecker
+from lectures.IPPlanarManipulator import PlanarRobot
+from lectures.IPBasicPRM import BasicPRM
 
 
 # --- Hilfsfunktion zur Visualisierung ---
