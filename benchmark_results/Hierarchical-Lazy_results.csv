@@ -1,8 +1,8 @@
 planner,scene,hasPath,length,euclidean_length,time,nodes,edges,roadmap_size
-Hierarchical-Lazy,U-Shape,True,18,40.54119232077693,0.02027606964111328,17,36,36
-Hierarchical-Lazy,L-Shape,True,19,34.31389613537791,0.01678323745727539,44,90,90
-Hierarchical-Lazy,Corridor,False,0,0.0,0.0050449371337890625,0,0,0
-Hierarchical-Lazy,Complex Shape,True,32,56.912223408615624,0.02435302734375,34,59,59
-Hierarchical-Lazy,Multiple Obstacles,True,20,26.58537452327873,0.04579520225524902,32,47,47
-Hierarchical-Lazy,Crossed Obstacles,True,20,44.31122021891101,0.02257084846496582,66,138,138
-Hierarchical-Lazy,Random Obstacles,True,22,34.31710581984787,0.03885531425476074,77,153,153
+Hierarchical-Lazy,U-Shape,True,24,39.7408230004765,0.018950223922729492,70,145,145
+Hierarchical-Lazy,L-Shape,False,0,0.0,0.011644840240478516,0,0,0
+Hierarchical-Lazy,Corridor,False,0,0.0,0.008977174758911133,0,0,0
+Hierarchical-Lazy,Complex Shape,True,29,54.15385722144139,0.030939102172851562,29,50,50
+Hierarchical-Lazy,Multiple Obstacles,False,0,0.0,0.04313921928405762,0,0,0
+Hierarchical-Lazy,Crossed Obstacles,True,22,41.531071274098,0.016084909439086914,43,94,94
+Hierarchical-Lazy,Random Obstacles,True,18,32.7857780439855,0.03195476531982422,60,119,119
