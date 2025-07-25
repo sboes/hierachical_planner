@@ -69,7 +69,7 @@ class HierarchicalPlanner:
 
             coords_segment = local_planner.get_path_coordinates(sub_path)
 
-            # 🛑 Verwerfe Segment, wenn Koordinaten außerhalb globaler Limits sind
+            # Verwerfe Segment, wenn Koordinaten außerhalb globaler Limits sind
             if not all(
                     self.limits[0][0] <= p[0] <= self.limits[0][1] and
                     self.limits[1][0] <= p[1] <= self.limits[1][1]

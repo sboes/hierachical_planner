@@ -26,7 +26,7 @@ planner_order = [
     "Hierarchical-Basic",
     "Hierarchical-Lazy",
     "LazyPRM",
-    "VisibilityPRM",
+    "VisPRM",
 ]
 planner_colors = {
     "BasicPRM": "#1f77b4",
