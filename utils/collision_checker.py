@@ -13,6 +13,10 @@ class CollisionChecker:
             if hasattr(obs, 'exterior'):
                 xs, ys = obs.exterior.xy
                 ax.fill(xs, ys, color='lightcoral', alpha=0.6)
+            else:
+                # Für den Fall, dass das Hindernis keine exterior-Eigenschaft hat
+                xs, ys = obs.xy
+                ax.fill(xs, ys, color='lightcoral', alpha=0.6)
 
     def point_in_collision(self, pos):
         pt = Point(pos[0], pos[1])
