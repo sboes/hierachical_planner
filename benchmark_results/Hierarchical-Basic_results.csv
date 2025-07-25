@@ -1,0 +1,8 @@
+planner,scene,hasPath,length,euclidean_length,time,nodes,edges,roadmap_size
+Hierarchical-Basic,U-Shape,True,21,44.9745148055073,0.0735628604888916,33,74,74
+Hierarchical-Basic,L-Shape,True,27,58.297697445715094,0.06338930130004883,49,103,103
+Hierarchical-Basic,Corridor,True,31,67.79687119461212,0.10783147811889648,42,84,84
+Hierarchical-Basic,Complex Shape,True,39,76.70033635378381,0.13525962829589844,62,118,118
+Hierarchical-Basic,Multiple Obstacles,False,0,0.0,0.10222935676574707,0,0,0
+Hierarchical-Basic,Crossed Obstacles,True,26,61.231917552309085,0.0695040225982666,47,102,102
+Hierarchical-Basic,Random Obstacles,True,16,31.747233113322896,0.0938255786895752,107,214,214
