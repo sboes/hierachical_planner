@@ -2,6 +2,7 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
+from collision_checker import CollisionChecker
 
 def lazy_prm_visualize(planner, solution=[], ax=None, node_size=300):
     graph = planner.graph.copy()

@@ -68,6 +68,13 @@ def visualize_hierarchical_planning(hier_planner, collision_checker, config_low)
     axes[2].set_aspect("equal")
     axes[2].grid(True)
 
+    # draw obstacles if they are provided
+    if hasattr(collision_checker, "obstacles"):
+        for poly in collision_checker.obstacles:
+            patch = plt.Polygon(list(poly.exterior.coords), closed=True, color='gray', alpha=0.5)
+            axes[2].add_patch(patch)
+
+
     # alle Achsen gleich skalieren
     for ax in axes:
         ax.set_xlim(xlim)

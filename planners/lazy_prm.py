@@ -16,11 +16,19 @@ class LazyPRM:
         self.colliding_edges = []
         self.non_colliding_edges = []
 
-    def _point_in_collision(self, pos):
+    def point_in_collision(self, pos):
         return self._collision_checker.point_in_collision(pos)
 
-    def _line_in_collision(self, p1, p2):
+    def line_in_collision(self, p1, p2):
         return self._collision_checker.line_in_collision(p1, p2)
+
+    def _point_in_collision(self, pos):
+        """Check if a point is in collision."""
+        return self.point_in_collision(pos)
+
+    def _line_in_collision(self, p1, p2):
+        """Check if a line segment is in collision."""
+        return self.line_in_collision(p1, p2)
 
     def _get_random_free_position(self, max_tries=1000):
         for _ in range(max_tries):
